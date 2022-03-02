@@ -4,7 +4,7 @@ Choose-your-own project - HarvardX: PH125.9x Capstone Course for the Data Scienc
 
 Done by Usha V
 
-The best algorithm to predict whether or not a patient has diabetes, based on certain diagnostic measurements included in the dataset. In particular, all patients here are females at least 21 years old of Pima Indian heritage.
+The best algorithm to predict whether or not a patient has diabetes, based on certain diagnostic measurements included in the dataset. In particular, all patients are females at least 21 years old of Pima Indian heritage.
 
 In this project we have developed a machine learning algorithm that predicts whether a patient has diabetes or not, based on the PIMA Indians Diabetes DataSet from the National Institute of Diabetes, Digestive and Kidney Diseases.
 
