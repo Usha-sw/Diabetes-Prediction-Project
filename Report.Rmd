@@ -1,0 +1,449 @@
+---
+title: "PIMA Indians Diabetes Prediction Project"
+subtitle: "HarvardX: PH125.9x Data Science - Choose your own project"
+author: "Usha V"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output:
+  pdf_document: 
+    toc: true
+    toc_depth: 3
+    number_sections: true
+geometry: margin=1in
+biblio-style: apalike
+documentclass: book
+classoption: openany
+link-citations: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA, message=FALSE, warning=FALSE)
+```
+
+# Overview
+
+This project is done for 'Choose-your-own project' of the HervardX: PH125.9x Data Science: Capstone course. The present report starts with a general idea of the project followed by analysis and report.
+
+For this, the given dataset is prepared and setup. An exploratory data analysis is carried out in order to develop a machine learning algorithm that could predict whether a patient is diabetic or not. Results are explained. Finally, the report ends with some concluding remarks.
+
+
+## Introduction
+
+Diabetes is one of the fastest growing chronic life threatening disease that has already affected 422 million people worldwide according to the report of World Health Organization (WHO), in 2018. Due to the presence of a relatively long asymptomatic phase, early detection of diabetes is always desired for a clinically meaningful outcome. Around 50% of all people suffering from diabetes are undiagnosed because of its long-term asymptomatic phase.
+
+The objective of the dataset is to diagnostically predict whether or not a patient has diabetes, based on certain diagnostic measurements included in the dataset. Several constraints were placed on the selection of these instances from a larger database. In particular, all patients here are females at least 21 years old of Pima Indian heritage.
+
+The dataset consists of several medical predictor variables and one target variable, Outcome. Predictor variables includes the number of pregnancies the patient has had, their BMI, insulin level, age, and so on.
+
+There are 768 observations and 8 independent variables in the dataset. The target variable indicates the test result of the patient. It is 1 when the test result is positive and 0 when the test result is negative.
+
+This project will make a performance comparison between different machine learning algorithms in order to assess the correctness in classifying data with respect to efficiency and effectiveness of each algorithm based on the metrics accuracy, precision, sensitivity and specificity, for better diagnosis.
+
+Diagnosis in an early stage is essential to  facilitate the subsequent clinical management of patients and increase the life of diabetic patients.
+
+The major models used and tested are supervised learning models (algorithms that learn from labelled data), which are most used in these kinds of data analysis.
+
+The utilization of data science and machine learning approaches in medical fields proves to be prolific as such approaches may be considered of great assistance in the decision making process of medical practitioners. With an unfortunate increasing trend of diabetic cases, comes also a big deal of data which is of significant use in furthering clinical and medical research, and much
+more to the application of data science and machine learning in the aforementioned domain.
+
+
+## Aim of the project
+
+The objective of this report is to train machine learning models to predict whether a patient is diabetic or not. Data is transformed to reveal patterns in the dataset and create a more robust analysis.
+As previously said, the optimal model will be selected following the metrics accuracy, sensitivity, and f1 score, amongst other factors. We will later define these metrics.
+We can use machine learning method to extract the features of diabetes and classify them. It would be helpful to determine whether a given sample appears to be Diabetic("1") or not("0").
+
+The machine learning models that we will apply in this report try to create a classifier that provides a high accuracy level combined with a low rate of false-negatives (high sensitivity). 
+
+
+## Dataset
+
+The present report covers the PIMA Indians Diabetes DataSet (https://www.kaggle.com/uciml/pima-indians-diabetes-database/version/1).
+The Pima Indian Diabetes Dataset, originally from the National Institute of Diabetes and Digestive and Kidney Diseases, contains information of 768 women from a population near Phoenix, Arizona, USA. The outcome tested was Diabetes, 258 tested positive and 500 tested negative. Therefore, there is one target (dependent) variable and the 8 attributes (TYNECKI, 2018): pregnancies, OGTT(Oral Glucose Tolerance Test), blood pressure, skin thickness, insulin, BMI(Body Mass Index), age, pedigree diabetes function. The Pima population has been under study by the National Institute of Diabetes and Digestive and Kidney Diseases at intervals of 2 years since 1965. As epidemiological evidence indicates that T2DM results from interaction of genetic and environmental factors. The Pima Indians Diabetes Dataset includes information about attributes that could and should be related to the onset of diabetes and its future complications.
+
+The .csv format file containing the data is loaded from my personal github account.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, eval = TRUE}
+if(!require(dplyr)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+if(!require(ggplot2)) install.packages("ggplot2", repos = "http://cran.us.r-project.org")
+if(!require(corrplot)) install.packages("recorrplotadr", repos = "http://cran.us.r-project.org")
+if(!require(gridExtra)) install.packages("gridExtra", repos = "http://cran.us.r-project.org")
+if(!require(pROC)) install.packages("pROC", repos = "http://cran.us.r-project.org")
+if(!require(caTools)) install.packages("caTools", repos = "http://cran.us.r-project.org")
+if(!require(caretEnsemble)) install.packages("caretEnsemble", repos = "http://cran.us.r-project.org")
+if(!require(grid)) install.packages("grid", repos = "http://cran.us.r-project.org")
+if(!require(readr)) install.packages("readr", repos = "http://cran.us.r-project.org")
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
+if(!require(ggfortify)) install.packages("ggfortify", repos = "http://cran.us.r-project.org")
+if(!require(glmnet)) install.packages("glmnet", repos = "http://cran.us.r-project.org")
+if(!require(randomForest)) install.packages("randomForest", repos = "http://cran.us.r-project.org")
+if(!require(nnet)) install.packages("nnet", repos = "http://cran.us.r-project.org")
+if(!require(funModeling)) install.packages("funModeling", repos = "http://cran.us.r-project.org")
+if(!require(Momocs)) install.packages("Momocs", repos = "http://cran.us.r-project.org")
+if(!require(rminer)) install.packages("rminer", repos = "http://cran.us.r-project.org")
+library(funModeling)
+if(!require(corrplot)) install.packages("corrplot", repos = "http://cran.us.r-project.org")
+if(!require(e1071)) install.packages("e1071", repos = "http://cran.us.r-project.org")
+if(!require(Amelia)) install.packages("Amelia", repos = "http://cran.us.r-project.org")
+if(!require(mice)) install.packages("mice", repos = "http://cran.us.r-project.org")
+library(mice)
+
+# The data file will be loaded from my personal github account
+data <- read.csv("https://raw.githubusercontent.com/Usha-sw/Diabetes-Prediction-Project/main/diabetes.csv")
+```
+
+The dataset’s features describe characteristics of the diabetic patients. The features information are specified below:
+
+ - Attribute Description:
+
+    1. Pregnancies --- Number of times pregnant
+    2. Glucose --- The blood plasma glucose     concentration after a 2 hour oral glucose tolerance test (mg/dL)
+    3. BloodPressure --- Diastolic blood pressure (mm/Hg)
+    4. SKinThickness --- Skinfold Triceps skin fold thickness (mm)
+    5. Insulin --- 2 Hour serum insulin (mu U/ml)
+    6. BMI --- Body mass index (weight in kg/(height in m)^2)
+    7. DiabetesPedigreeFunction --- A function that determines the risk of type 2 diabetes based on family history, the larger the function, the higher the risk of type 2 diabetes.
+    8. Age
+    9. Outcome --- Whether the person is diagnosed with type 2 diabetes (1 = yes, 0 = no)
+
+The dataset has nine attributes(parameters) in which there are eight independent variables (Pregnancies, Glucose, Blood Pressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age) and one dependent variable (Outcome).
+There are 768 observations and 8 independent variables in the dataset. The target variable indicates the test result of the patient. It is 1 when the test result is positive and 0 when the test result is negative.
+
+# Methods and Analysis
+
+## Data Analysis
+
+Before we study the data set, let’s convert the output variable (‘Outcome’) into a categorical variable. This is necessary because our output will be in the form of 2 classes, True or False. Where true will denote that a patient has diabetes and false denotes that a person is diabetes free.
+
+```{r}
+data$Outcome <- factor(data$Outcome, levels = c(0,1), labels = c("False", "True"))
+```
+By observing our dataset, we found that it contains 768 observations with 9 variables.
+```{r}
+str(data)
+```
+```{r}
+head(data)
+```
+```{r}
+summary(data)
+```
+
+While analyzing the structure of the data set, we can see that the minimum values for Glucose, Bloodpressure, Skinthickness, Insulin, and BMI are all zero. This is not ideal since no one can have a value of zero for Glucose, blood pressure, etc. Therefore,  such values are treated as missing observations.
+
+```{r}
+data[, 2:7][data[, 2:7] == 0] <- NA
+```
+
+To check how many missing values we have now, let’s visualize the data:
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, eval = TRUE}
+missmap(data)
+```
+
+The above illustrations show that our data set has plenty missing values and removing all of them will leave us with an even smaller data set, therefore, we can perform imputations by using the mice package in R.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, eval = TRUE}
+mice_mod <- mice::mice(data[, c("Glucose","BloodPressure","SkinThickness","Insulin","BMI")], method='rf')
+mice_complete <- complete(mice_mod)
+
+#Transfer the predicted missing values into the main data set
+data$Glucose <- mice_complete$Glucose
+data$BloodPressure <- mice_complete$BloodPressure
+data$SkinThickness <- mice_complete$SkinThickness
+data$Insulin<- mice_complete$Insulin
+data$BMI <- mice_complete$BMI
+```
+
+To check if there are still any missing values, let’s use the missmap plot:
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, eval = TRUE}
+missmap(data)
+```
+
+The output looks good, there is no missing data.
+
+```{r}
+prop.table(table(data$Outcome))
+```
+By analysing the dataset, we discover that it is a bit unbalanced in its proportions.
+```{r}
+options(repr.plot.width=4, repr.plot.height=4)
+ggplot(data, aes(x=Outcome))+geom_bar(fill="blue",alpha=0.5)+theme_bw()+labs(title="Distribution of Diagnosis")
+```
+Also the plot of proportions confirms that the target variable is slightly unbalanced.
+
+```{r}
+plot_num(data %>% select (-Outcome), bins=10)
+```
+Most of the variables of the dataset are normally distributed as shown in the previous plot.
+
+Now we have to check if there is any correlation between variables as machine learning algorithms assume that the predictor variables are independent from each other.
+
+```{r}
+correlationMatrix <- cor(data[,1:ncol(data)-1])
+heatmap(correlationMatrix)
+```
+
+As shown by this heatmap, there is not much correlation between features except for some values that are approx greater than 0.5 The features are:
+
+Age-Pregnancies : Pregnancies can increase with age and stop after a certain age.
+
+Glucose-Diabetes : Higher glucose count has higher probability of being diagnosed with diabetes
+
+Glucose-Insulin : Higher level Glucose means more Insulin
+
+BMI-SkinThickness : Higher the BMI, fatter the person is.
+
+```{r}
+# find attributes that are highly corrected (ideally >0.90)
+highlyCorrelated <- findCorrelation(correlationMatrix, cutoff=0.9)
+# print indexes of highly correlated attributes
+print(highlyCorrelated)
+```
+There are no convincing relationship between the independent parameters. The original dataset can be used for further exploration.
+
+## Modelling Approach
+
+### Modelling
+
+Principal Component Analysis (PCA).
+
+To avoid redundancy and relevancy, we used the function ‘prncomp’ to calculate the Principal Component Analysis (PCA) and select the rights components to avoid correlated variables that can be detrimental to our clustering analysis.
+One of the common problems in analysis of complex data comes from a large number of variables, which requires a large amount of memory and computation power. This is where PCA comes in. It is a technique to reduce the dimension of the feature space by feature extraction.
+The main idea of PCA is to reduce the dimensionality of a data set consisting of many variables correlated with each other, either heavily or lightly, while retaining the variation present in the dataset, up to the maximum extent. The same is done by transforming the variables to a new set of variables, which are known as the principal components (or simply, the PCs) and are orthogonal, ordered such that the retention of variation present in the original variables decrease as we move down in the order.
+```{r}
+pca_res_data <- prcomp(data[,1:ncol(data)-1], center = TRUE, scale = TRUE)
+plot(pca_res_data, type="l")
+```
+```{r}
+summary(pca_res_data)
+```
+As we can observe from the above table, first three components explains the 0.6434 of the variance. We need all principal components to explain more than 0.99. Hence all components are important for our analysis.
+
+```{r}
+pca_df <- as.data.frame(pca_res_data$x)
+ggplot(pca_df, aes(x=PC1, y=PC2, col=data$Outcome)) + geom_point(alpha=0.5)
+```
+The data of the first 2 components can be easily separated into two classes. This is caused by the fact that the variance explained by these components is not large. The data can be easily separated.
+
+```{r}
+g_pc1 <- ggplot(pca_df, aes(x=PC1, fill=data$Outcome)) + geom_density(alpha=0.25)  
+g_pc2 <- ggplot(pca_df, aes(x=PC2, fill=data$Outcome)) + geom_density(alpha=0.25)  
+grid.arrange(g_pc1, g_pc2, ncol=2)
+```
+
+Linear Discriminant Analysis (LDA)
+
+Another approach is to use the Linear Discriminant Analysis (LDA) instead of PCA. LDA takes in consideration the different classes and could get better results.
+The particularity of LDA is that it models the distribution of predictors separately in each of the response classes, and then it uses Bayes’ theorem to estimate the probability. It is important to know that LDA assumes a normal distribution for each class, a class-specific mean, and a common variance.
+
+```{r}
+lda_res_data <- MASS::lda(Outcome~., data = data, center = TRUE, scale = TRUE) 
+lda_res_data
+#Data frame of the LDA for visualization purposes
+lda_df_predict <- predict(lda_res_data, data)$x %>% as.data.frame() %>% cbind(Outcome=data$Outcome)
+```
+
+```{r}
+ggplot(lda_df_predict, aes(x=LD1, fill=Outcome)) + geom_density(alpha=0.5)
+```
+
+### Model creation
+
+We are going to get a training and a testing set to use when building some models. We split the modified dataset into Train (80%) and Test (20%), in order to predict whether a patient is diabetic or not, by building machine learning classification models.
+
+```{r}
+set.seed(1815) 
+data_sampling_index <- createDataPartition(data$Outcome, times=1, p=0.8, list = FALSE)
+train_data <- data[data_sampling_index, ]
+test_data <- data[-data_sampling_index, ]
+```
+
+We analysed the proportion of training set and test set also.
+
+```{r}
+prop.table(table(train_data$Outcome)) * 100
+prop.table(table(test_data$Outcome)) * 100
+```
+
+### Naive Bayes Model
+
+The Naive Bayesian classifier is based on Bayes’ theorem with the independence assumptions between predictors. A Naive Bayesian model is easy to build, with no complicated iterative parameter estimation which makes it particularly useful for very large datasets. Bayes theorem provides a way of calculating the posterior probability, P(c|x), from P(c), P(x), and P(x|c). Naive Bayes classifier assume that the effect of the value of a predictor (x) on a given class (c) is independent of the values of other predictors. This assumption is called class conditional independence.
+
+```{r}
+model_naiveb <- naiveBayes(Outcome ~ ., data = train_data)
+prediction_naiveb <- predict(model_naiveb, test_data)
+confusionmatrix_naiveb <- confusionMatrix(prediction_naiveb, test_data$Outcome)
+confusionmatrix_naiveb
+```
+The accuracy of this model can be seen through the confusion matrix.
+Important metrics to be identified are:
+Sensitivity (recall) represent the true positive rate: the proportions of actual positives correctly identified.
+Specificity is the true negative rate: the proportion of actual negatives correctly identified.
+Accuracy is the general score of the classifier model performance as it is the ratio of how many samples are correctly classified to all samples.
+F1 score: the harmonic mean of precision and sensitivity.
+Accuracy and F1 score would be used to compare the result with the benchmark model.
+Precision: the number of correct positive results divided by the number of all positive results returned by the classifier.
+
+
+### Logistic Regression Model 
+
+Logistic Regression is widely used for binary classification like (0,1). The binary logistic model is used to estimate the probability of a binary response based on one or more predictor (or independent) variables (features).
+
+```{r}
+model_logreg <- train(Outcome~.,
+                      data=train_data,
+                      method="glm")
+prediction_logreg<- predict(model_logreg,test_data)
+# Check results
+confusionmatrix_logreg <- confusionMatrix(prediction_logreg, test_data$Outcome)
+confusionmatrix_logreg
+```
+The most important variables that permit the best prediction and contribute the most to the model are the following:
+
+```{r}
+plot(varImp(model_logreg), main="Top variables - Log Regr")
+```
+
+
+### Random Forest Model
+
+Random forests are a very popular machine learning approach that addresses the shortcomings of decision trees using a clever idea. The goal is to improve prediction performance and reduce instability by averaging multiple decision trees (a forest of trees constructed with randomness).
+Random forest is another ensemble method based on decision trees. It split data into sub-samples, trains decision tree classifiers on each sub-sample and averages prediction of each classifier. Splitting dataset causes higher bias but it is compensated by large decrease in variance.
+Random Forest is a supervised learning algorithm and it is flexible, easy to use machine learning algorithm that produces, even without hyper-parameter tuning, a great result most of the time. It is also one of the most used algorithms, because of it’s simplicity and the fact that it can be used for both classification and regression tasks.
+Random forest builds multiple decision trees and merges them together to get a more accurate and stable prediction.
+
+```{r}
+model_randomforest <- train(Outcome~.,
+                            data=train_data,
+                            method="rf")
+prediction_randomforest <- predict(model_randomforest, test_data)
+#Check results
+confusionmatrix_randomforest <- confusionMatrix(prediction_randomforest, test_data$Outcome)
+confusionmatrix_randomforest
+```
+
+```{r}
+plot(varImp(model_randomforest), main="Top variables- Random Forest")
+```
+
+
+### K Nearest Neighbor (KNN) Model
+
+KNN (K-Nearest Neighbors) is one of many (supervised learning) algorithms used in data mining and machine learning, it’s a classifier algorithm where the learning is based on “how similar” is a data from other. K nearest neighbors is a simple algorithm that stores all available cases and classifies new cases based on a similarity measure (e.g., distance functions).
+
+```{r}
+model_knn <- train(Outcome~.,
+                   data=train_data,
+                   method="knn",
+                   tuneLength=5) #The tuneLength parameter tells the algorithm to try different default values for the main parameter
+                   #In this case we used 5 default values
+prediction_knn <- predict(model_knn, test_data)
+confusionmatrix_knn <- confusionMatrix(prediction_knn, test_data$Outcome)
+confusionmatrix_knn
+```
+
+The most important variables that permit the best prediction and contribute the most to the model are the following:
+
+```{r}
+plot(varImp(model_knn), main="Top variables - KNN")
+```
+
+
+### Neural Network with PCA Model
+
+Artificial Neural Networks (NN) are a types of mathematical algorithms originating from the simulation of networks of biological neurons.
+An artificial Neural Network consists of nodes (called neurons) and edges (called synapses). Input data is transmitted through the weighted synapses to the neurons where calculations are processed and then either sent to further neurons or represent the output.
+
+Neural Networks take in the weights of connections between neurons. The weights are balanced, learning data point in the wake of learning data point . When all weights are trained, the neural network can be utilized to predict the class or a quantity, if there should arise an occurrence of regression of a new input data point. With Neural networks, extremely complex models can be trained and they can be utilized as a kind of black box, without playing out an unpredictable complex feature engineering before training the model. Joined with the “deep approach” even more unpredictable models can be picked up to realize new possibilities. 
+```{r}
+model_nnet_pca <- train(Outcome~.,
+                        data=train_data,
+                        method="nnet",
+                        trace=FALSE)
+prediction_nnet_pca <- predict(model_nnet_pca, test_data)
+confusionmatrix_nnet_pca <- confusionMatrix(prediction_nnet_pca, test_data$Outcome)
+confusionmatrix_nnet_pca
+```
+The most important variables that permit the best prediction and contribute the most to the model are the following:
+
+```{r}
+plot(varImp(model_nnet_pca), main="Top variables - NNET PCA")
+```
+
+
+### Neural Network with LDA Model
+
+
+We are going to create a training and test set of LDA data created in previous chapters:
+
+```{r}
+train_data_lda <- lda_df_predict[data_sampling_index, ]
+test_data_lda <- lda_df_predict[-data_sampling_index, ]
+```
+
+```{r}
+model_nnet_lda <- train(Outcome~.,
+                        data = train_data_lda,
+                        method="nnet",
+                        trace=FALSE)
+prediction_nnet_lda <- predict(model_nnet_lda, test_data_lda)
+confusionmatrix_nnet_lda <- confusionMatrix(prediction_nnet_lda, test_data_lda$Outcome)
+confusionmatrix_nnet_lda
+```
+# Results
+
+We can now compare and evaluate the results obtained for the above calculations.
+
+```{r}
+confusionmatrix_list <- list(
+  Naive_Bayes=confusionmatrix_naiveb, 
+  Logistic_regr=confusionmatrix_logreg,
+  Random_Forest=confusionmatrix_randomforest,
+  KNN=confusionmatrix_knn,
+  Neural_PCA=confusionmatrix_nnet_pca,
+  Neural_LDA=confusionmatrix_nnet_lda)   
+confusionmatrix_list_results <- sapply(confusionmatrix_list, function(x) x$byClass)
+confusionmatrix_list_results %>% knitr::kable()
+```
+
+
+# Discussion
+
+We will now describe the metrics that we will compare in this section.
+
+Accuracy is the most important metric. It is the number of correct predictions made divided by the total number of predictions made, multiplied by 100 to turn it into a percentage.
+
+Precision is the number of True Positives divided by the number of True Positives and False Positives. Put another way, it is the number of positive predictions divided by the total number of positive class values predicted. It is also called the Positive Predictive Value (PPV). A low precision can also indicate a large number of False Positives.
+
+Recall (Sensitivity) is the number of True Positives divided by the number of True Positives and the number of False Negatives. Put another way it is the number of positive predictions divided by the number of positive class values in the test data. It is also called Sensitivity or the True Positive Rate. Recall can be thought of as a measure of a classifiers completeness. A low recall indicates many False Negatives.
+
+The F1 Score is the 2 x ((precision x recall) / (precision + recall)). It is also called the F Score or the F Measure. Put another way, the F1 score conveys the balance between the precision and the recall.
+
+The best results for sensitivity (detection of diabetes) is Neural Network with LDA model which also has a great F1 score.
+
+
+```{r}
+confusionmatrix_results_max <- apply(confusionmatrix_list_results, 1, which.is.max)
+output_report <- data.frame(metric=names(confusionmatrix_results_max), 
+                            best_model=colnames(confusionmatrix_list_results)[confusionmatrix_results_max],
+                            value=mapply(function(x,y) {confusionmatrix_list_results[x,y]}, 
+                                         names(confusionmatrix_results_max), 
+                                         confusionmatrix_results_max))
+rownames(output_report) <- NULL
+output_report
+```
+
+# Conclusion
+
+This paper treats the PIMA Indian Diabetes diagnosis problem as a pattern classification problem. In this report we investigated several machine learning model and we selected the optimal  model by selecting a high accuracy level combined with a low rate of false-negatives (the means that the metric is high sensitivity).
+
+The Optimal algorithm for Sensitivity, F1, Balanced Accuracy and other metrics are given in the previous table.
+
+
+# Appendix - Environment
+```{r}
+print("Operating System:")
+R.version
+```
